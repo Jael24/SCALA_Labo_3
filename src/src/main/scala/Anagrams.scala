@@ -1,4 +1,5 @@
 import scala.collection.immutable._
+import scala.io.Source
 
 
 object Anagrams extends App {
@@ -10,33 +11,34 @@ object Anagrams extends App {
   type Sentence = List[Word]
 
   /** A fingerprint is a string which represents a sorted sequence of characters:
-   *  Examples: 
+   *  Examples:
    *
    *    "aaccx"
    *    "abyz"
    *    "ppp"
    *    ""
    */
-
   type FingerPrint = String
 
 
-  /** The dictionary is simply a sequence of words.
-   *  You can begin your development with this simple example. 
-   *  A dictionary of English words is given to you as an external file (linuxwords.txt)  
-   *  that you can load to use with your program  
-   */
+  // File input for the dictionary
+//  val in = Source.fromFile("path")
 
-  val dictionary: List[Word] =    
+  /** The dictionary is simply a sequence of words.
+   *  You can begin your development with this simple example.
+   *  A dictionary of English words is given to you as an external file (linuxwords.txt)
+   *  that you can load to use with your program
+   */
+  val dictionary: List[Word] =
     List("ate", "eat", "tea", "pot", "top", "sonja", "jason", "normal",
          "I", "love", "you", "olive")
+//  val dictionary: List[Word] = in.getLines.toList filter(word => word.forall(ch => ch.isLetter))
 
 
   /** Converts a word/sentence into its fingerprint.
    *  The fingerprint has the same characters as the word, with the same
    *  number of occurrences, but the characters appear in sorted order.
    */
-
   def fingerPrint(s: Word): FingerPrint = s.toLowerCase.toList.sorted.toString()
   def fingerPrint(s: Sentence): FingerPrint = fingerPrint(s.mkString(""))
 
@@ -52,7 +54,6 @@ object Anagrams extends App {
    *
    *   "aet"-> List("ate", "eat", "tea")
    */
-
   val matchingWords: Map[FingerPrint, List[Word]] = dictionary groupBy fingerPrint withDefaultValue List()
 
 
@@ -76,11 +77,10 @@ object Anagrams extends App {
    *  Note that the order of the subsequences does not matter -- the subsequences
    *  in the example above could have been displayed in some other order.
    */
-
   def subseqs(fp: FingerPrint): List[FingerPrint] = {
-    (for (len <- 1 to fp.length; combinations <- fp.toSeq.combinations(len).map(_.unwrap)) yield combinations.mkString).toList
+    (for (len <- 1 to fp.length; combinations <- fp.toSeq.combinations(len).map(_.unwrap))
+      yield combinations.mkString).toList
   }
-
 
   // Test code with for example:
   println(subseqs("aabbc"))
@@ -92,7 +92,6 @@ object Anagrams extends App {
    *  the fingerprint `x` -- any character appearing in `y` must
    *  appear in `x`.
    */
-
   def subtract(x: FingerPrint, y: FingerPrint): FingerPrint = ???
 
   // Test code with for example:
@@ -117,7 +116,6 @@ object Anagrams extends App {
    *
    *  Note: There is only one anagram of an empty sentence.
    */
-
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
 
   // Test code with for example:
