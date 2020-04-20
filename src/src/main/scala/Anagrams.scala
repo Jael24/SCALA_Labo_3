@@ -37,8 +37,8 @@ object Anagrams extends App {
    *  number of occurrences, but the characters appear in sorted order.
    */
 
-  def fingerPrint(s: Word): FingerPrint = ???
-  def fingerPrint(s: Sentence): FingerPrint = ??? 
+  def fingerPrint(s: Word): FingerPrint = s.toLowerCase.toList.sorted.toString()
+  def fingerPrint(s: Sentence): FingerPrint = fingerPrint(s.mkString(""))
 
 
   /** `matchingWords` is a `Map` from fingerprints to a sequence of all
@@ -53,15 +53,15 @@ object Anagrams extends App {
    *   "aet"-> List("ate", "eat", "tea")
    */
 
-  val matchingWords: Map[FingerPrint, List[Word]] = ???
+  val matchingWords: Map[FingerPrint, List[Word]] = dictionary groupBy fingerPrint withDefaultValue List()
 
 
   /** Returns all the anagrams of a given word. */
-  def wordAnagrams(word: Word): List[Word] = ???
+  def wordAnagrams(word: Word): List[Word] = matchingWords(fingerPrint(word))
 
   // Test code with for example:
-  // println(wordAnagrams("eta"))
-  // println(wordAnagrams("jbdikb"))
+  println(wordAnagrams("eta"))
+  println(wordAnagrams("jbdikb"))
 
 
   /** Returns the list of all subsequences of a fingerprint.
