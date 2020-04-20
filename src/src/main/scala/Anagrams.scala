@@ -77,11 +77,13 @@ object Anagrams extends App {
    *  in the example above could have been displayed in some other order.
    */
 
-  def subseqs(fp: FingerPrint): List[FingerPrint] = ???
+  def subseqs(fp: FingerPrint): List[FingerPrint] = {
+    (for (len <- 1 to fp.length; combinations <- fp.toSeq.combinations(len).map(_.unwrap)) yield combinations.mkString).toList
+  }
 
 
   // Test code with for example:
-  // println(subseqs("aabbc"))
+  println(subseqs("aabbc"))
 
 
   /** Subtracts fingerprint `y` from fingerprint `x`.
