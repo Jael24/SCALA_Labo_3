@@ -1,3 +1,10 @@
+/**
+ * Lab 3: Anagrams
+ * Authors: Jael Dubey, Luc Wachter
+ * Goal: Provide methods to generate anagrams of words and sentences using a word dictionary
+ * Scala 2.13.1
+ */
+
 import scala.collection.immutable._
 import scala.io.Source
 
