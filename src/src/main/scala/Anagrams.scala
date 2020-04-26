@@ -22,7 +22,8 @@ object Anagrams extends App {
 
 
   // File input for the dictionary
-  val in = Source.fromFile("/home/luc/HEIG/Semestre6/SCALA/Labos/Labo3-Anagrammes/src/linuxwords.txt")
+  //val in = Source.fromFile("/home/luc/HEIG/Semestre6/SCALA/Labos/Labo3-Anagrammes/src/linuxwords.txt")
+  val in = Source.fromFile("/media/jael/Data/Cours/SCALA/Laboratoires/3 - Anagrammes/src/linuxwords.txt")
 
   /** The dictionary is simply a sequence of words.
    * You can begin your development with this simple example.
@@ -107,7 +108,6 @@ object Anagrams extends App {
   // Test code with for example:
   println(subtract("aabbcc", "abc"))
 
-
   /** Returns a list of all anagram sentences of the given sentence.
    *
    * An anagram of a sentence is formed by taking the fingerprint of all the characters of
@@ -127,18 +127,19 @@ object Anagrams extends App {
    * Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-
-    def justATest(fp: FingerPrint): List[List[Word]] = {
-      subseqs(fp).filter(x => matchingWords contains x).map(x => matchingWords(x))
-    }
-
-    justATest(fingerPrint(sentence))
+    val fp = fingerPrint(sentence)
+    if (!fp.isEmpty) {
+      subseqs(fp) // Extract power set of the fingerprint
+        .flatMap(subSeq => wordAnagrams(subSeq) // On each "subset" of the fingerprint, search the anagrams
+          .flatMap(anagram => sentenceAnagrams(List(subtract(fp, subSeq))) // Store found anagram and redo the operation, without the fingerprint of the found anagram
+            .map(subW => anagram :: subW))) // Make the list with stored anagram and the recursively found other words
+    } else List(List())
   }
 
   // Test code with for example:
   println(sentenceAnagrams(List("I", "eat")))
-//   println(sentenceAnagrams(List("eat", "tea")))
-//   println(sentenceAnagrams(List("you", "olive")))
-  // println(sentenceAnagrams(List("I", "love", "you")))
+  println(sentenceAnagrams(List("eat", "tea")))
+  println(sentenceAnagrams(List("you", "olive")))
+  println(sentenceAnagrams(List("I", "love", "you")))
 
 }
