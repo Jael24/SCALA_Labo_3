@@ -11,48 +11,49 @@ object Anagrams extends App {
   type Sentence = List[Word]
 
   /** A fingerprint is a string which represents a sorted sequence of characters:
-   *  Examples:
+   * Examples:
    *
-   *    "aaccx"
-   *    "abyz"
-   *    "ppp"
-   *    ""
+   * "aaccx"
+   * "abyz"
+   * "ppp"
+   * ""
    */
   type FingerPrint = String
 
 
   // File input for the dictionary
-//  val in = Source.fromFile("path")
+  //val in = Source.fromFile("path")
 
   /** The dictionary is simply a sequence of words.
-   *  You can begin your development with this simple example.
-   *  A dictionary of English words is given to you as an external file (linuxwords.txt)
-   *  that you can load to use with your program
+   * You can begin your development with this simple example.
+   * A dictionary of English words is given to you as an external file (linuxwords.txt)
+   * that you can load to use with your program
    */
   val dictionary: List[Word] =
     List("ate", "eat", "tea", "pot", "top", "sonja", "jason", "normal",
-         "I", "love", "you", "olive")
-//  val dictionary: List[Word] = in.getLines.toList filter(word => word.forall(ch => ch.isLetter))
+      "I", "love", "you", "olive")
+  //val dictionary: List[Word] = in.getLines.toList filter(word => word.forall(ch => ch.isLetter))
 
 
   /** Converts a word/sentence into its fingerprint.
-   *  The fingerprint has the same characters as the word, with the same
-   *  number of occurrences, but the characters appear in sorted order.
+   * The fingerprint has the same characters as the word, with the same
+   * number of occurrences, but the characters appear in sorted order.
    */
   def fingerPrint(s: Word): FingerPrint = s.toLowerCase.toList.sorted.toString()
+
   def fingerPrint(s: Sentence): FingerPrint = fingerPrint(s.mkString(""))
 
 
   /** `matchingWords` is a `Map` from fingerprints to a sequence of all
-   *  the words that have that fingerprint.
-   *  This map serves as an easy way to obtain all the anagrams of a word given its fingerprint.
+   * the words that have that fingerprint.
+   * This map serves as an easy way to obtain all the anagrams of a word given its fingerprint.
    *
-   *  For example, the word "eat" has the fingerprint "aet".
-   *  Incidentally, so do the words "ate" and "tea".
+   * For example, the word "eat" has the fingerprint "aet".
+   * Incidentally, so do the words "ate" and "tea".
    *
-   *  This means that the `matchingWords` map will contain an entry:
+   * This means that the `matchingWords` map will contain an entry:
    *
-   *   "aet"-> List("ate", "eat", "tea")
+   * "aet"-> List("ate", "eat", "tea")
    */
   val matchingWords: Map[FingerPrint, List[Word]] = dictionary groupBy fingerPrint withDefaultValue List()
 
@@ -66,55 +67,65 @@ object Anagrams extends App {
 
 
   /** Returns the list of all subsequences of a fingerprint.
-   *  This includes the fingerprint itself, i.e.
-   *  "ko" is a subsequence of "kkoo". It also always includes
-   *  the empty string "".
+   * This includes the fingerprint itself, i.e.
+   * "ko" is a subsequence of "kkoo". It also always includes
+   * the empty string "".
    *
-   *  Example: the subsequences of the fingerprint "abbc" are
+   * Example: the subsequences of the fingerprint "abbc" are
    *
-   *    List("", "c", "b", "bc", "bb", "bbc", "a", "ac", "ab", "abc", "abb", "abbc")
+   * List("", "c", "b", "bc", "bb", "bbc", "a", "ac", "ab", "abc", "abb", "abbc")
    *
-   *  Note that the order of the subsequences does not matter -- the subsequences
-   *  in the example above could have been displayed in some other order.
+   * Note that the order of the subsequences does not matter -- the subsequences
+   * in the example above could have been displayed in some other order.
    */
   def subseqs(fp: FingerPrint): List[FingerPrint] = {
-    (for (len <- 1 to fp.length; combinations <- fp.toSeq.combinations(len).map(_.unwrap))
+    (for (len <- 0 to fp.length; combinations <- fp.toSeq.combinations(len).map(_.unwrap))
       yield combinations.mkString).toList
   }
 
   // Test code with for example:
-  println(subseqs("aabbc"))
+  println(subseqs("abbc"))
 
 
   /** Subtracts fingerprint `y` from fingerprint `x`.
    *
-   *  The precondition is that the fingerprint `y` is a subsequence of
-   *  the fingerprint `x` -- any character appearing in `y` must
-   *  appear in `x`.
+   * The precondition is that the fingerprint `y` is a subsequence of
+   * the fingerprint `x` -- any character appearing in `y` must
+   * appear in `x`.
    */
-  def subtract(x: FingerPrint, y: FingerPrint): FingerPrint = ???
+  def subtract(x: FingerPrint, y: FingerPrint): FingerPrint =
+    if (y.toSet subsetOf x.toSet) {
+      def s(x: List[Char], y: List[Char]): List[Char] = y match {
+        case List() => x
+        case z :: zs => s(x.patch(x.indexOf(z), "", 1), zs)
+      }
+
+      s(x.toList, y.toList).mkString("")
+    } else {
+      "y must be a subsequence of x"
+    }
 
   // Test code with for example:
-  // println(subtract("aabbcc", "abc"))
+  println(subtract("aabbcc", "abc"))
 
 
   /** Returns a list of all anagram sentences of the given sentence.
    *
-   *  An anagram of a sentence is formed by taking the fingerprint of all the characters of
-   *  all the words in the sentence, and producing all possible combinations of words with those characters,
-   *  such that the words have to be from the dictionary.
+   * An anagram of a sentence is formed by taking the fingerprint of all the characters of
+   * all the words in the sentence, and producing all possible combinations of words with those characters,
+   * such that the words have to be from the dictionary.
    *
-   *  The number of words in the sentence and its anagrams does not have to correspond.
-   *  For example, the sentence `List("I", "love", "you")` is an anagram of the sentence `List("You", "olive")`.
+   * The number of words in the sentence and its anagrams does not have to correspond.
+   * For example, the sentence `List("I", "love", "you")` is an anagram of the sentence `List("You", "olive")`.
    *
-   *  Also, two sentences with the same words but in a different order are considered two different anagrams.
-   *  For example, sentences `List("You", "olive")` and `List("olive","you")` are different anagrams of
-   *  `List("I", "love", "you")`.
+   * Also, two sentences with the same words but in a different order are considered two different anagrams.
+   * For example, sentences `List("You", "olive")` and `List("olive","you")` are different anagrams of
+   * `List("I", "love", "you")`.
    *
-   *  Note: in case that the words of the sentence are in the dictionary, then the sentence is the anagram of itself,
-   *  so it has to be returned in this list.
+   * Note: in case that the words of the sentence are in the dictionary, then the sentence is the anagram of itself,
+   * so it has to be returned in this list.
    *
-   *  Note: There is only one anagram of an empty sentence.
+   * Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
 
