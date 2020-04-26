@@ -22,8 +22,7 @@ object Anagrams extends App {
 
 
   // File input for the dictionary
-  //val in = Source.fromFile("/home/luc/HEIG/Semestre6/SCALA/Labos/Labo3-Anagrammes/src/linuxwords.txt")
-  val in = Source.fromFile("/media/jael/Data/Cours/SCALA/Laboratoires/3 - Anagrammes/src/linuxwords.txt")
+  val in = Source.fromFile("linuxwords.txt")
 
   /** The dictionary is simply a sequence of words.
    * You can begin your development with this simple example.
@@ -31,8 +30,8 @@ object Anagrams extends App {
    * that you can load to use with your program
    */
   //val dictionary: List[Word] =
-    //List("ate", "eat", "tea", "pot", "top", "sonja", "jason", "normal", "I", "love", "you", "olive")
-  val dictionary: List[Word] = in.getLines.toList filter(word => word.forall(ch => ch.isLetter))
+  //List("ate", "eat", "tea", "pot", "top", "sonja", "jason", "normal", "I", "love", "you", "olive")
+  val dictionary: List[Word] = in.getLines.toList filter (word => word.forall(ch => ch.isLetter))
 
 
   /** Converts a word/sentence into its fingerprint.
@@ -78,10 +77,9 @@ object Anagrams extends App {
    * Note that the order of the subsequences does not matter -- the subsequences
    * in the example above could have been displayed in some other order.
    */
-  def subseqs(fp: FingerPrint): List[FingerPrint] = {
+  def subseqs(fp: FingerPrint): List[FingerPrint] =
     (for (len <- 0 to fp.length; combinations <- fp.toSeq.combinations(len).map(_.unwrap))
       yield combinations.mkString).toList
-  }
 
   // Test code with for example:
   println(subseqs("abbc"))
@@ -94,16 +92,10 @@ object Anagrams extends App {
    * appear in `x`.
    */
   def subtract(x: FingerPrint, y: FingerPrint): FingerPrint = if (y.toSet subsetOf x.toSet) {
-      @scala.annotation.tailrec
-      def s(x: List[Char], y: List[Char]): List[Char] = y match {
-        case List() => x
-        case z :: zs => s(x.patch(x.indexOf(z), "", 1), zs)
-      }
-
-      s(x.toList, y.toList).mkString("")
-    } else {
-      throw new Error("Second fingerprint must be a subsequence of the first")
-    }
+    x.toList.diff(y.toList).mkString("")
+  } else {
+    throw new Error("Second fingerprint must be a subsequence of the first")
+  }
 
   // Test code with for example:
   println(subtract("aabbcc", "abc"))
