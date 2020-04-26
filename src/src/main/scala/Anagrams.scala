@@ -22,24 +22,23 @@ object Anagrams extends App {
 
 
   // File input for the dictionary
-  //val in = Source.fromFile("path")
+  val in = Source.fromFile("/home/luc/HEIG/Semestre6/SCALA/Labos/Labo3-Anagrammes/src/linuxwords.txt")
 
   /** The dictionary is simply a sequence of words.
    * You can begin your development with this simple example.
    * A dictionary of English words is given to you as an external file (linuxwords.txt)
    * that you can load to use with your program
    */
-  val dictionary: List[Word] =
-    List("ate", "eat", "tea", "pot", "top", "sonja", "jason", "normal",
-      "I", "love", "you", "olive")
-  //val dictionary: List[Word] = in.getLines.toList filter(word => word.forall(ch => ch.isLetter))
+  //val dictionary: List[Word] =
+    //List("ate", "eat", "tea", "pot", "top", "sonja", "jason", "normal", "I", "love", "you", "olive")
+  val dictionary: List[Word] = in.getLines.toList filter(word => word.forall(ch => ch.isLetter))
 
 
   /** Converts a word/sentence into its fingerprint.
    * The fingerprint has the same characters as the word, with the same
    * number of occurrences, but the characters appear in sorted order.
    */
-  def fingerPrint(s: Word): FingerPrint = s.toLowerCase.toList.sorted.toString()
+  def fingerPrint(s: Word): FingerPrint = s.toLowerCase.toList.sorted.mkString("")
 
   def fingerPrint(s: Sentence): FingerPrint = fingerPrint(s.mkString(""))
 
@@ -93,8 +92,8 @@ object Anagrams extends App {
    * the fingerprint `x` -- any character appearing in `y` must
    * appear in `x`.
    */
-  def subtract(x: FingerPrint, y: FingerPrint): FingerPrint =
-    if (y.toSet subsetOf x.toSet) {
+  def subtract(x: FingerPrint, y: FingerPrint): FingerPrint = if (y.toSet subsetOf x.toSet) {
+      @scala.annotation.tailrec
       def s(x: List[Char], y: List[Char]): List[Char] = y match {
         case List() => x
         case z :: zs => s(x.patch(x.indexOf(z), "", 1), zs)
@@ -102,7 +101,7 @@ object Anagrams extends App {
 
       s(x.toList, y.toList).mkString("")
     } else {
-      "y must be a subsequence of x"
+      throw new Error("Second fingerprint must be a subsequence of the first")
     }
 
   // Test code with for example:
@@ -127,11 +126,19 @@ object Anagrams extends App {
    *
    * Note: There is only one anagram of an empty sentence.
    */
-  def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+  def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
+
+    def justATest(fp: FingerPrint): List[List[Word]] = {
+      subseqs(fp).filter(x => matchingWords contains x).map(x => matchingWords(x))
+    }
+
+    justATest(fingerPrint(sentence))
+  }
 
   // Test code with for example:
-  // println(sentenceAnagrams(List("eat", "tea")))
-  // println(sentenceAnagrams(List("you", "olive")))
+  println(sentenceAnagrams(List("I", "eat")))
+//   println(sentenceAnagrams(List("eat", "tea")))
+//   println(sentenceAnagrams(List("you", "olive")))
   // println(sentenceAnagrams(List("I", "love", "you")))
 
 }
